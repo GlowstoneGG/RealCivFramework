@@ -2,6 +2,7 @@ package gg.glowstone.rcf.folia.modules.survival
 
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.block.TileState
@@ -62,13 +63,13 @@ internal object BedOwnership : Module("bed-ownership") {
             if (owner != player.uniqueId) {
                 // Cancelling the click also stops others setting their spawn here.
                 event.isCancelled = true
-                player.sendActionBar("This bed belongs to someone else")
+                ctx.actionBar.show(player, "bed-ownership", Component.text("This bed belongs to someone else"))
             } else if (player.isSneaking) {
                 event.isCancelled = true
                 head.setOwner(null)
                 player.persistentDataContainer.remove(playerBedKey)
                 player.setRespawnLocation(null)
-                player.sendActionBar("You gave up this bed")
+                ctx.actionBar.show(player, "bed-ownership", Component.text("You gave up this bed"))
             }
         }
 
@@ -81,7 +82,7 @@ internal object BedOwnership : Module("bed-ownership") {
             releaseOld(player)
             head.setOwner(player.uniqueId)
             player.persistentDataContainer.set(playerBedKey, PersistentDataType.STRING, "${head.world.uid};${head.x};${head.y};${head.z}")
-            player.sendActionBar("You claimed this bed")
+            ctx.actionBar.show(player, "bed-ownership", Component.text("You claimed this bed"))
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

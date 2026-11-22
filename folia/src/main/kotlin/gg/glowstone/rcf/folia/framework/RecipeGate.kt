@@ -19,6 +19,7 @@ import org.bukkit.inventory.Recipe
 internal class RecipeGate(
     private val plugin: RealCivFrameworkPlugin,
     private val professions: ProfessionService,
+    private val actionBar: ActionBar,
 ) : Listener {
     private val catalog get() = professions.catalog
 
@@ -62,7 +63,7 @@ internal class RecipeGate(
         val rule = catalog.rule(key, recipe.resultKey())
         if (catalog.allows(rule, professions.load(player))) return
         event.inventory.result = null
-        player.sendActionBar(Component.text(describe(rule), NamedTextColor.RED))
+        actionBar.show(player, "recipe-gate", Component.text(describe(rule), NamedTextColor.RED))
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

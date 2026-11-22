@@ -26,7 +26,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
 internal object RankGates : Module("rank-gates") {
     override val reads = listOf(Miner, Librarian)
 
-    private fun Player.deny(message: String) = sendActionBar(Component.text(message, NamedTextColor.RED))
+    private fun Player.deny(message: String) = ctx.actionBar.show(this, "rank-gates", Component.text(message, NamedTextColor.RED))
 
     private fun ItemStack.allEnchants(): Map<Enchantment, Int> =
         (itemMeta as? EnchantmentStorageMeta)?.storedEnchants ?: enchantments

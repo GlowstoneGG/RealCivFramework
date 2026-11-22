@@ -31,6 +31,9 @@ internal object PatDown : Module("pat-down") {
     private const val PERIOD = 5L
     private const val REACH_SQUARED = 3.0 * 3.0
 
+    // Just over two redraws, so the line drops soon after the windup ends.
+    private const val PROGRESS_MS = 600L
+
     private val searching = ConcurrentHashMap.newKeySet<UUID>()
 
     private class ReadOnly : InventoryHolder {
@@ -59,19 +62,19 @@ internal object PatDown : Module("pat-down") {
             val holding = searcher.inventory.itemInMainHand.type == Material.SPYGLASS
             if (!searcher.isSneaking || !holding || !inReach(searcher, target)) {
                 searching.remove(searcher.uniqueId)
-                searcher.sendActionBar(Component.text("Search interrupted", NamedTextColor.RED))
+                ctx.actionBar.show(searcher, "pat-down", Component.text("Search interrupted", NamedTextColor.RED))
                 task.cancel()
                 return@runAtFixedRate
             }
             elapsed += PERIOD.toInt()
             if (elapsed < WINDUP_TICKS) {
-                searcher.sendActionBar(Component.text("Searching ${target.name}..."))
+                ctx.actionBar.show(searcher, "pat-down", Component.text("Searching ${target.name}..."), ttlMs = PROGRESS_MS)
                 return@runAtFixedRate
             }
             searching.remove(searcher.uniqueId)
             task.cancel()
             searcher.openInventory(snapshot(target))
-            target.sendActionBar(Component.text("${searcher.name} searched you"))
+            ctx.actionBar.show(target, "pat-down", Component.text("${searcher.name} searched you"))
         }, { searching.remove(searcher.uniqueId) }, 1L, PERIOD)
     }
 
@@ -86,7 +89,7 @@ internal object PatDown : Module("pat-down") {
             when {
                 Downed.isDowned(target.uniqueId) -> if (inReach(searcher, target)) searcher.openInventory(target.inventory)
                 ctx.rank(searcher, Hunter) >= SkillLevel.APPRENTICE -> windup(searcher, target)
-                else -> searcher.sendActionBar(Component.text("Only Hunters can search a standing player"))
+                else -> ctx.actionBar.show(searcher, "pat-down", Component.text("Only Hunters can search a standing player"))
             }
         }
 

@@ -14,11 +14,12 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-/** What modules and professions get: storage, cached ranks, XP awards with cooldowns, and placed-block tracking. */
+/** What modules and professions get: storage, cached ranks, XP awards with cooldowns, placed-block tracking, and the shared action bar. */
 internal class CivContext(
     val plugin: RealCivFrameworkPlugin,
     val professions: ProfessionService,
     val blocks: RecentBlockActions,
+    val actionBar: ActionBar,
 ) : Listener {
     private data class CooldownKey(val player: UUID, val key: String)
 

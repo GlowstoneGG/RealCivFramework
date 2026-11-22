@@ -35,7 +35,7 @@ internal object ArmorShield : Module("armor-shield") {
     private fun scheduleReadyNotice(player: Player, at: Long) {
         val ticks = ((at - System.currentTimeMillis()) / 50).coerceAtLeast(1)
         player.scheduler.runDelayed(ctx.plugin, {
-            if (readyAt.remove(player.uniqueId, at)) player.sendActionBar(Component.text("Your armour shield has recharged"))
+            if (readyAt.remove(player.uniqueId, at)) ctx.actionBar.show(player, "armor-shield", Component.text("Your armour shield has recharged"))
         }, null, ticks)
     }
 
@@ -54,8 +54,8 @@ internal object ArmorShield : Module("armor-shield") {
             val at = now + RECHARGE_MS
             readyAt[victim.uniqueId] = at
             victim.world.playSound(victim.location, Sound.ITEM_SHIELD_BREAK, 1f, 0.8f)
-            victim.sendActionBar(Component.text("Your armour shield absorbed the blow"))
-            attacker.sendActionBar(Component.text("${victim.name}'s armour absorbed the blow"))
+            ctx.actionBar.show(victim, "armor-shield", Component.text("Your armour shield absorbed the blow"))
+            ctx.actionBar.show(attacker, "armor-shield", Component.text("${victim.name}'s armour absorbed the blow"))
             scheduleReadyNotice(victim, at)
         }
 

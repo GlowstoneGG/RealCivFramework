@@ -2,6 +2,7 @@ package gg.glowstone.rcf.folia.modules.survival
 
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.data.Lightable
@@ -38,7 +39,7 @@ internal object CampfireRest : Module("campfire-rest") {
 
     private fun rest(player: Player) {
         if (!player.nearLitCampfire()) {
-            player.sendActionBar("It's chilly without a fire")
+            ctx.actionBar.show(player, "campfire-rest", Component.text("It's chilly without a fire"))
             return
         }
         val max = player.getAttribute(Attribute.MAX_HEALTH)?.value ?: return
@@ -50,7 +51,7 @@ internal object CampfireRest : Module("campfire-rest") {
         player.heal(HEAL)
         pdc.set(dayKey, PersistentDataType.LONG, day)
         pdc.set(healedKey, PersistentDataType.INTEGER, healed + 1)
-        player.sendActionBar("Resting by the fire")
+        ctx.actionBar.show(player, "campfire-rest", Component.text("Resting by the fire"))
     }
 
     override fun listeners() = listOf(object : Listener {

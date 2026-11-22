@@ -63,6 +63,7 @@ To remove a profession, take it out of the list. Stored XP stays in player data 
 | `rank(player, profession)` / `perk(player, profession)` | Cached ranks, safe to read from any thread. Unloaded professions read as Novice. |
 | `award(player, profession, amount, cooldownMs, key)` | Grant XP. `key` separates cooldowns, for example ore vs stone. |
 | `blocks` | Recently placed block tracking, so place/break loops can't farm XP. |
+| `actionBar.show(player, slot, text, status, ttlMs)` | Show a line on the action bar without erasing other modules' lines. Use one slot per kind of message; a new message replaces the old one in its slot. Pass `status = true` for lines about the player's ongoing state, which sit leftmost. Safe from any thread. Never call `player.sendActionBar` directly. |
 | `plugin` | For schedulers. |
 | `professions` | Direct storage access (`load`, `add`, `set`, `clear`). |
 | `civKey(name)` | A `NamespacedKey` under the fixed `rcf` namespace, for PDC data. |

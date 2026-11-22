@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIPaperConfig
+import gg.glowstone.rcf.folia.framework.ActionBar
 import gg.glowstone.rcf.folia.framework.ProfessionCatalog
 import gg.glowstone.rcf.folia.framework.ProfessionCommands
 import gg.glowstone.rcf.folia.framework.CivContext
@@ -38,10 +39,12 @@ class RealCivFrameworkPlugin : SuspendingJavaPlugin() {
         for (module in modules) for (profession in module.reads.filter { catalog[it.id] == null }) {
             logger.warning("Module '${module.name}' reads profession '${profession.id}', which isn't loaded; players count as Novice in it")
         }
-        val professions = ProfessionService(catalog)
-        val ctx = CivContext(this, professions, RecentBlockActions())
-        val recipes = RecipeGate(this, professions)
+        val actionBar = ActionBar(this)
+        val professions = ProfessionService(catalog, actionBar)
+        val ctx = CivContext(this, professions, RecentBlockActions(), actionBar)
+        val recipes = RecipeGate(this, professions, actionBar)
         ProfessionCommands(this, professions).register()
+        server.pluginManager.registerEvents(actionBar, this)
         server.pluginManager.registerEvents(ctx, this)
         server.pluginManager.registerEvents(recipes, this)
         for (player in server.onlinePlayers) player.scheduler.run(this, {

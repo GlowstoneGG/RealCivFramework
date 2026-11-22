@@ -119,7 +119,7 @@ internal object Stamina : Module("stamina") {
         speed.removeModifier(windedKey)
         if (winded) {
             speed.addTransientModifier(AttributeModifier(windedKey, WINDED_SLOW, AttributeModifier.Operation.MULTIPLY_SCALAR_1))
-            player.sendActionBar(Component.text("Winded", NamedTextColor.RED))
+            ctx.actionBar.show(player, "stamina", Component.text("Winded", NamedTextColor.RED))
         }
     }
 
