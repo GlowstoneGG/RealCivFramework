@@ -7,6 +7,7 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
@@ -104,16 +105,25 @@ internal object Downed : Module("downed") {
         val head = player.location.block.getRelative(BlockFace.UP)
         val target = head.location.takeIf { !carried && head.type.isAir }
         if (target == state.barrier) return
-        state.barrier?.let { player.sendBlockChange(it, it.block.blockData) }
+        state.barrier?.let { restoreBlock(player, it) }
         target?.let { player.sendBlockChange(it, Material.BARRIER.createBlockData()) }
         state.barrier = target
+    }
+
+    // After a teleport the old barrier spot can belong to another region, and only that region may read it.
+    private fun restoreBlock(player: Player, at: Location) {
+        if (Bukkit.isOwnedByCurrentRegion(at)) return player.sendBlockChange(at, at.block.blockData)
+        Bukkit.getRegionScheduler().run(ctx.plugin, at) {
+            val data = at.block.blockData
+            player.scheduler.run(ctx.plugin, { player.sendBlockChange(at, data) }, null)
+        }
     }
 
     /** Clears in-memory and client state. Returns false if the player wasn't downed. */
     private fun end(player: Player, keepSaved: Boolean = false): Boolean {
         val state = downed.remove(player.uniqueId) ?: return false
         state.task?.cancel()
-        state.barrier?.let { player.sendBlockChange(it, it.block.blockData) }
+        state.barrier?.let { restoreBlock(player, it) }
         player.hideBossBar(state.bar)
         player.setPose(Pose.STANDING, false)
         if (!keepSaved) {
