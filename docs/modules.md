@@ -8,6 +8,8 @@ The seven default professions: Farmer, Builder, Miner, Healer, Librarian, Hunter
 
 Hunter is the fighter. Killing any mob gives Hunter XP equal to its max health (1 second cooldown). Kills drop 20% more loot per rank, up to double at Grandmaster.
 
+Miner XP comes from breaking ores and stone. Blocks a player placed, and stone that lava and water form (stone generators), give none.
+
 ### Recipe gates
 
 `plugins/RealCivFramework/recipes.yml` sets which profession rank unlocks each recipe, and which recipes nobody can craft. It is created on first start from the gates each profession declares; by default Blacksmith Apprentice unlocks the anvil, Hunter Apprentice the fishing rod and bow, and Hunter Journeyman the crossbow.

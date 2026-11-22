@@ -3,6 +3,7 @@ package gg.glowstone.rcf.folia.framework
 import gg.glowstone.rcf.core.blocks.PlacedBits
 import gg.glowstone.rcf.core.blocks.RecentBlockActions
 import org.bukkit.ExplosionResult
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.data.Directional
@@ -13,6 +14,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockExplodeEvent
+import org.bukkit.event.block.BlockFormEvent
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPistonEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
@@ -24,13 +26,13 @@ import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 
 /**
- * Which blocks players placed, kept in chunk PDC for the block's lifetime (one bit per block, per 16-high section).
+ * Which blocks players placed or lava and water formed, kept in chunk PDC for the block's lifetime (one bit per block, per 16-high section).
  * Callers must own the block's region.
  */
 internal class PlacedBlocks(private val recent: RecentBlockActions = RecentBlockActions()) : Listener {
     private val fallingKey = civKey("placed_falling")
 
-    /** True for a player-placed block, and for 10 seconds after one broke so drop handlers still see it. */
+    /** True for a placed or fluid-formed block, and for 10 seconds after one broke so drop handlers still see it. */
     fun isPlaced(block: Block) = get(block) || recent.wasPlacedBreak(block.position())
 
     /** False if this player was already rewarded for placing at this position within the last 24 hours. */
@@ -40,6 +42,12 @@ internal class PlacedBlocks(private val recent: RecentBlockActions = RecentBlock
     fun onPlace(event: BlockPlaceEvent) {
         val blocks = (event as? BlockMultiPlaceEvent)?.replacedBlockStates?.map { it.block } ?: listOf(event.block)
         for (block in blocks) occupy(block, true)
+    }
+
+    /** Lava meeting water (stone, cobblestone, obsidian and basalt generators) counts as placed, so generators can't farm XP. */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onForm(event: BlockFormEvent) {
+        if (event.block.type == Material.LAVA || event.newState.type == Material.STONE) occupy(event.block, true)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

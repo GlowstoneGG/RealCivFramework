@@ -62,7 +62,7 @@ To remove a profession, take it out of the list. Stored XP stays in player data 
 |---|---|
 | `rank(player, profession)` / `perk(player, profession)` | Cached ranks, safe to read from any thread. Unloaded professions read as Novice. |
 | `award(player, profession, amount, cooldownMs, key)` | Grant XP. `key` separates cooldowns, for example ore vs stone. |
-| `blocks` | `isPlaced(block)` is true for blocks a player placed, so place/break loops can't farm XP. Stored in chunk data, so it survives restarts; pistons and falling blocks carry it, and breaking, explosions, fire and other entity changes clear it. `allowBuilderAward(player, block)` stops repeat placement rewards at one spot for 24 hours (in memory). Call from the block's region. |
+| `blocks` | `isPlaced(block)` is true for blocks a player placed or that lava and water formed, so place/break loops and stone generators can't farm XP. Stored in chunk data, so it survives restarts; pistons and falling blocks carry it, and breaking, explosions, fire and other entity changes clear it. `allowBuilderAward(player, block)` stops repeat placement rewards at one spot for 24 hours (in memory). Call from the block's region. |
 | `actionBar.show(player, slot, text, status, ttlMs)` | Show a line on the action bar without erasing other modules' lines. Slot names are shared by every module, so prefix them with your module name (`"sprinting"`, `"sprinting-progress"`). A new message replaces the old one in its slot. Pass `status = true` for lines about the player's ongoing state, which sit leftmost. Safe from any thread. Never call `player.sendActionBar` directly. |
 | `plugin` | For schedulers. |
 | `professions` | Direct storage access (`load`, `add`, `set`, `clear`). |
