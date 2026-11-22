@@ -46,8 +46,8 @@ internal object Stamina : Module("stamina") {
     private const val SHIELD_MAX = 20.0
     private const val SHIELD_COOLDOWN_TICKS = 100
 
-    // Horizontal distance per 5-tick window below which a sprinting player counts as running into a wall.
-    private const val SPRINT_MIN_MOVE = 0.75
+    // Ignore floating point noise in the horizontal displacement, not slow terrain movement.
+    private const val MOVEMENT_EPSILON_SQUARED = 1e-10
     private const val WALK_MIN_MOVE = 0.1
 
     private const val REGEN_DELAY_TICKS = 20L
@@ -77,6 +77,17 @@ internal object Stamina : Module("stamina") {
 
     // Each player's entry is only written on that player's region; `winded` is also read from damage events.
     private val states = ConcurrentHashMap<UUID, State>()
+    private val downedHits = ConcurrentHashMap.newKeySet<EntityDamageByEntityEvent>()
+
+    /** Downed calls this when it replaces an accepted hit with its own damage outcome. */
+    fun recordDownedHit(event: EntityDamageEvent) {
+        if (enabled && event is EntityDamageByEntityEvent && event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            downedHits.add(event)
+        }
+    }
+
+    fun isMovingSprint(sprinting: Boolean, insideVehicle: Boolean, winded: Boolean, horizontalDistanceSquared: Double): Boolean =
+        sprinting && !insideVehicle && !winded && horizontalDistanceSquared > MOVEMENT_EPSILON_SQUARED
 
     /** Multiplier on a base cost: heavier armour (sprinting only), Hunter rank and carrying a downed player (Healer rank). */
     fun costMultiplier(armorWeight: Double, hunterRank: Int, carrierHealerRank: Int?): Double =
@@ -138,7 +149,7 @@ internal object Stamina : Module("stamina") {
                 state.wasDowned = false
                 refill(player, state, REVIVED_AT)
             }
-            val sprinting = player.isSprinting && !player.isInsideVehicle && moved >= SPRINT_MIN_MOVE * SPRINT_MIN_MOVE && !state.winded
+            val sprinting = isMovingSprint(player.isSprinting, player.isInsideVehicle, state.winded, moved)
             if (sprinting) spend(player, SPRINT_PER_SECOND * SECONDS_PER_TICK * player.sprintMultiplier())
             regen(player, state, sprinting, moved >= WALK_MIN_MOVE * WALK_MIN_MOVE)
             if (state.winded && state.value >= WINDED_UNTIL) setWinded(player, state, false)
@@ -215,8 +226,11 @@ internal object Stamina : Module("stamina") {
             }
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.MONITOR)
         fun onMelee(event: EntityDamageByEntityEvent) {
+            // Consume the mark even if a later listener uncancelled the event; one handler charges both paths.
+            val replacedByDowned = downedHits.remove(event)
+            if (event.isCancelled && !replacedByDowned) return
             val attacker = event.damager as? Player ?: return
             if (event.cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return
             val cost = MELEE_HIT * (1 - 0.08 * ctx.rank(attacker, Hunter).ordinal)

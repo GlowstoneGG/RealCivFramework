@@ -3,6 +3,7 @@ package gg.glowstone.rcf.folia.modules.downed
 import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import gg.glowstone.rcf.folia.modules.stamina.Stamina
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
@@ -133,6 +134,7 @@ internal object Downed : Module("downed") {
             val player = event.entity as? Player ?: return
             if (isDowned(player.uniqueId)) {
                 event.isCancelled = true
+                Stamina.recordDownedHit(event)
                 end(player)
                 player.health = 0.0
                 return
@@ -143,6 +145,7 @@ internal object Downed : Module("downed") {
             val inventory = player.inventory
             if (inventory.itemInMainHand.type == Material.TOTEM_OF_UNDYING || inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING) return
             event.isCancelled = true
+            Stamina.recordDownedHit(event)
             player.health = (MAX_OVERKILL - overkill).coerceAtLeast(1.0)
             down(player, BLEED_OUT_TICKS)
             player.sendMessage(Component.text("You are bleeding out. A Healer can revive you.", NamedTextColor.RED))
