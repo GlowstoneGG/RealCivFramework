@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.combatlog
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.combattag.CombatTag
@@ -40,7 +39,7 @@ internal object CombatLog : Module("combat-log", dependsOn = listOf(CombatTag)) 
     private val bodies = ConcurrentHashMap<UUID, Body>()
     private lateinit var killed: KilledStore
 
-    override fun start(ctx: CivContext) {
+    override fun start() {
         killed = KilledStore(ctx.plugin.dataFolder.resolve("combat-log-killed.txt"))
     }
 
@@ -82,7 +81,7 @@ internal object CombatLog : Module("combat-log", dependsOn = listOf(CombatTag)) 
 
     private fun Mannequin.owner(): UUID? = persistentDataContainer.get(ownerKey, PersistentDataType.STRING)?.let(UUID::fromString)
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler
         fun onQuit(event: PlayerQuitEvent) {
             val player = event.player

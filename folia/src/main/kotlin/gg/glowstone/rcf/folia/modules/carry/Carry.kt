@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.carry
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.downed.Downed
@@ -67,7 +66,7 @@ internal object Carry : Module("carry", dependsOn = listOf(Downed)) {
         }
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(ignoreCancelled = true)
         fun onInteract(event: PlayerInteractEntityEvent) {
             val carrier = event.player

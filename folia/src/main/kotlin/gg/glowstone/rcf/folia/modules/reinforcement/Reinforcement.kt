@@ -1,7 +1,6 @@
 package gg.glowstone.rcf.folia.modules.reinforcement
 
 import gg.glowstone.rcf.core.professions.SkillLevel
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.professions.Builder
@@ -54,7 +53,7 @@ internal object Reinforcement : Module("reinforcement") {
     private val breakKey = civKey("reinforcement_break")
     private val fallingKey = civKey("reinforcement_tier")
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onReinforce(event: PlayerInteractEvent) {
             if (event.action != Action.RIGHT_CLICK_BLOCK || event.hand != EquipmentSlot.HAND) return
@@ -169,15 +168,15 @@ internal object Reinforcement : Module("reinforcement") {
         @EventHandler
         fun onJoin(event: PlayerJoinEvent) {
             clearSlowdown(event.player)
-            showParticles(ctx, event.player)
+            showParticles(event.player)
         }
 
         @EventHandler
         fun onQuit(event: PlayerQuitEvent) = clearSlowdown(event.player)
     })
 
-    override fun start(ctx: CivContext) {
-        for (player in Bukkit.getOnlinePlayers()) showParticles(ctx, player)
+    override fun start() {
+        for (player in Bukkit.getOnlinePlayers()) showParticles(player)
     }
 
     private fun Tier.label() = name.lowercase()
@@ -220,7 +219,7 @@ internal object Reinforcement : Module("reinforcement") {
         for ((block, entry) in moved) ReinforcementStore.put(block.getRelative(direction), entry.spot.tier, entry.createdAt)
     }
 
-    private fun showParticles(ctx: CivContext, player: Player) {
+    private fun showParticles(player: Player) {
         player.scheduler.runAtFixedRate(ctx.plugin, { _ ->
             if (Tier.forItem(player.inventory.itemInMainHand.type) == null) return@runAtFixedRate
             val world = player.world

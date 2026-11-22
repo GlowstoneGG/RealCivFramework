@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.hunterranged
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.professions.Hunter
@@ -32,7 +31,7 @@ internal object HunterRanged : Module("hunter-ranged") {
         else -> 0.0
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onShoot(event: EntityShootBowEvent) {
             val player = event.entity as? Player ?: return

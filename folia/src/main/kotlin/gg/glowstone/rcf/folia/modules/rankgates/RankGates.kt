@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.rankgates
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.modules.professions.Librarian
 import gg.glowstone.rcf.folia.modules.professions.Miner
@@ -32,7 +31,7 @@ internal object RankGates : Module("rank-gates") {
     private fun ItemStack.allEnchants(): Map<Enchantment, Int> =
         (itemMeta as? EnchantmentStorageMeta)?.storedEnchants ?: enchantments
 
-    override fun listeners(ctx: CivContext): List<Listener> {
+    override fun listeners(): List<Listener> {
         val file = ctx.plugin.dataFolder.resolve("rank-gates.yml")
         if (!file.exists()) ctx.plugin.saveResource("rank-gates.yml", false)
         val rules = GateRules.parse(YamlConfiguration.loadConfiguration(file), ctx.plugin.logger::warning)

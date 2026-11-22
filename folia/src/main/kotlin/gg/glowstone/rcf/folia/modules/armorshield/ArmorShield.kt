@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.armorshield
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import net.kyori.adventure.text.Component
@@ -33,14 +32,14 @@ internal object ArmorShield : Module("armor-shield") {
     }
 
     /** Callers must be on the player's owning region. */
-    private fun scheduleReadyNotice(ctx: CivContext, player: Player, at: Long) {
+    private fun scheduleReadyNotice(player: Player, at: Long) {
         val ticks = ((at - System.currentTimeMillis()) / 50).coerceAtLeast(1)
         player.scheduler.runDelayed(ctx.plugin, {
             if (readyAt.remove(player.uniqueId, at)) player.sendActionBar(Component.text("Your armour shield has recharged"))
         }, null, ticks)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         // Before downed (HIGH), so an absorbed hit can't down the player.
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         fun onHit(event: EntityDamageByEntityEvent) {
@@ -57,7 +56,7 @@ internal object ArmorShield : Module("armor-shield") {
             victim.world.playSound(victim.location, Sound.ITEM_SHIELD_BREAK, 1f, 0.8f)
             victim.sendActionBar(Component.text("Your armour shield absorbed the blow"))
             attacker.sendActionBar(Component.text("${victim.name}'s armour absorbed the blow"))
-            scheduleReadyNotice(ctx, victim, at)
+            scheduleReadyNotice(victim, at)
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
@@ -79,7 +78,7 @@ internal object ArmorShield : Module("armor-shield") {
             player.persistentDataContainer.remove(rechargeKey)
             val at = System.currentTimeMillis() + remaining
             readyAt[player.uniqueId] = at
-            scheduleReadyNotice(ctx, player, at)
+            scheduleReadyNotice(player, at)
         }
     })
 }

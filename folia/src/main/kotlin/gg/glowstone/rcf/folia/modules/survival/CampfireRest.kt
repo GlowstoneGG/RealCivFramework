@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.survival
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import org.bukkit.Material
@@ -54,7 +53,7 @@ internal object CampfireRest : Module("campfire-rest") {
         player.sendActionBar("Resting by the fire")
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onSleep(event: PlayerBedEnterEvent) {
             if (event.bedEnterResult != PlayerBedEnterEvent.BedEnterResult.OK) return

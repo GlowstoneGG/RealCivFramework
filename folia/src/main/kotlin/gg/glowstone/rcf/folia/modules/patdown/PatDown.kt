@@ -1,7 +1,6 @@
 package gg.glowstone.rcf.folia.modules.patdown
 
 import gg.glowstone.rcf.core.professions.SkillLevel
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.modules.downed.Downed
 import gg.glowstone.rcf.folia.modules.professions.Hunter
@@ -76,7 +75,7 @@ internal object PatDown : Module("pat-down") {
         }, { searching.remove(searcher.uniqueId) }, 1L, PERIOD)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(ignoreCancelled = true)
         fun onInteract(event: PlayerInteractEntityEvent) {
             val searcher = event.player

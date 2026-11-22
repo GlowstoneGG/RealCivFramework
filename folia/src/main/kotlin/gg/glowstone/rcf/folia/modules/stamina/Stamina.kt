@@ -1,7 +1,6 @@
 package gg.glowstone.rcf.folia.modules.stamina
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.armorweight.ArmorWeight
@@ -190,11 +189,11 @@ internal object Stamina : Module("stamina") {
         }, { states.remove(player.uniqueId, state) }, PERIOD, PERIOD)
     }
 
-    override fun start(ctx: CivContext) {
+    override fun start() {
         for (player in ctx.plugin.server.onlinePlayers) player.scheduler.run(ctx.plugin, { track(player) }, null)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler
         fun onJoin(event: PlayerJoinEvent) = track(event.player)
 

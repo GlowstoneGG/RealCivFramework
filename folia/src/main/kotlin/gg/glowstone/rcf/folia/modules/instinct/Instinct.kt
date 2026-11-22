@@ -1,7 +1,6 @@
 package gg.glowstone.rcf.folia.modules.instinct
 
 import gg.glowstone.rcf.core.professions.SkillLevel
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.ProfessionRankChangeEvent
 import gg.glowstone.rcf.folia.framework.civKey
@@ -47,21 +46,21 @@ internal object Instinct : Module("instinct") {
         instance.addTransientModifier(AttributeModifier(key, value - instance.baseValue, AttributeModifier.Operation.ADD_NUMBER))
     }
 
-    private fun apply(ctx: CivContext, player: Player) {
+    private fun apply(player: Player) {
         player.setTransient(Attribute.WAYPOINT_TRANSMIT_RANGE, 0.0)
         player.setTransient(Attribute.WAYPOINT_RECEIVE_RANGE, receiveRange(ctx.rank(player, Hunter)))
     }
 
-    override fun start(ctx: CivContext) {
-        for (player in ctx.plugin.server.onlinePlayers) player.scheduler.run(ctx.plugin, { apply(ctx, player) }, null)
+    override fun start() {
+        for (player in ctx.plugin.server.onlinePlayers) player.scheduler.run(ctx.plugin, { apply(player) }, null)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.MONITOR)
-        fun onJoin(event: PlayerJoinEvent) = apply(ctx, event.player)
+        fun onJoin(event: PlayerJoinEvent) = apply(event.player)
 
         @EventHandler
-        fun onRankChange(event: ProfessionRankChangeEvent) = apply(ctx, event.player)
+        fun onRankChange(event: ProfessionRankChangeEvent) = apply(event.player)
 
         // shortcut: vanilla mobs rarely break blocks, so this fires mostly on door-breaking zombies, endermen and ravagers; hook a mob-AI module's block-break start once one exists.
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

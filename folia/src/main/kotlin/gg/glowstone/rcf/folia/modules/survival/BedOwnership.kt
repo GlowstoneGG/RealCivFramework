@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.survival
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import org.bukkit.Bukkit
@@ -40,7 +39,7 @@ internal object BedOwnership : Module("bed-ownership") {
     }
 
     /** Releases the player's previous bed if its chunk is loaded. */
-    private fun releaseOld(player: Player, ctx: CivContext) {
+    private fun releaseOld(player: Player) {
         val parts = player.persistentDataContainer.get(playerBedKey, PersistentDataType.STRING)?.split(';') ?: return
         val world = Bukkit.getWorld(UUID.fromString(parts[0])) ?: return
         val (x, y, z) = parts.drop(1).map(String::toInt)
@@ -53,7 +52,7 @@ internal object BedOwnership : Module("bed-ownership") {
         }
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onInteract(event: PlayerInteractEvent) {
             if (event.action != Action.RIGHT_CLICK_BLOCK || event.hand != EquipmentSlot.HAND) return
@@ -79,7 +78,7 @@ internal object BedOwnership : Module("bed-ownership") {
             val head = event.bed.bedHead() ?: return
             val player = event.player
             if (head.owner() == player.uniqueId) return
-            releaseOld(player, ctx)
+            releaseOld(player)
             head.setOwner(player.uniqueId)
             player.persistentDataContainer.set(playerBedKey, PersistentDataType.STRING, "${head.world.uid};${head.x};${head.y};${head.z}")
             player.sendActionBar("You claimed this bed")
