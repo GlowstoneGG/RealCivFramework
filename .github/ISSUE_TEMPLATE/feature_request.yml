@@ -1,0 +1,10 @@
+name: Feature request
+description: Propose a gameplay or development change
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the player-facing behavior and why it would help.
+    validations:
+      required: true

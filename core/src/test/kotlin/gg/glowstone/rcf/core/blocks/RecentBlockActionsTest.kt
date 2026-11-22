@@ -1,0 +1,35 @@
+package gg.glowstone.rcf.core.blocks
+
+import java.util.UUID
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class RecentBlockActionsTest {
+    @Test
+    fun `placed mining blocks are suppressed once and the marker expires`() {
+        var now = 1000L
+        val recent = RecentBlockActions(ttlMillis = 100, clock = { now })
+        val position = RecentBlockActions.Position(UUID.randomUUID(), 1, 64, 2)
+        recent.markPlaced(position)
+        assertTrue(recent.wasPlaced(position))
+        assertTrue(recent.wasPlacedBreak(position))
+        assertFalse(recent.wasPlaced(position))
+        recent.markPlaced(position)
+        now += 101
+        assertFalse(recent.wasPlaced(position))
+    }
+
+    @Test
+    fun `builder cannot repeatedly reward the same position within the window`() {
+        var now = 0L
+        val recent = RecentBlockActions(ttlMillis = 100, clock = { now })
+        val position = RecentBlockActions.Position(UUID.randomUUID(), 4, 70, 5)
+        val player = UUID.randomUUID()
+        assertTrue(recent.allowBuilderAward(player, position))
+        assertFalse(recent.allowBuilderAward(player, position))
+        assertTrue(recent.allowBuilderAward(UUID.randomUUID(), position))
+        now += 100
+        assertTrue(recent.allowBuilderAward(player, position))
+    }
+}

@@ -1,0 +1,31 @@
+# Generated names for the names module. Each player gets a random unused combination of a first and a last name,
+# joined by the separator, for example Alden_Ashford. Combinations longer than 16 characters are skipped.
+# Names may only use letters, digits and underscores. Changes apply after a restart; names already given out are kept.
+separator: "_"
+first: [
+  Alden, Bram, Cedric, Dorian, Edric, Fenn, Garrick, Hale,
+  Ivo, Jorund, Kael, Lorne, Merek, Nils, Osric, Perrin,
+  Quill, Rowan, Soren, Tobin, Ulric, Varek, Wendel, Yorick,
+  Ada, Brenna, Cora, Della, Elsa, Freya, Greta, Hilde,
+  Isla, Juna, Kira, Lena, Mira, Nessa, Orla, Petra,
+  Runa, Sela, Tilda, Una, Vera, Wren, Yara, Zina,
+  Ansel, Bertil, Dain, Eamon, Florin, Gideon, Hamish, Idris,
+  Jasper, Konrad, Leif, Magnus, Niall, Oswin, Piers, Ragnar,
+  Sigrid, Torvald, Ulla, Viggo, Wynn, Anya, Bryony, Clem,
+  Dagny, Elin, Fiora, Gwen, Halla, Ilse, Jessa, Kestrel,
+  Liv, Maren, Nell, Odile, Pia, Rhea, Saga, Thea,
+  Ylva, Bastian, Corin, Elric, Hugo, Otto, Silas
+]
+last: [
+  Ashford, Barrow, Black, Brook, Cairn, Cobb, Crane, Dale,
+  Drake, Elm, Fairweather, Fenwick, Flint, Frost, Gale, Glen,
+  Graves, Hart, Hawke, Heath, Holt, Hollow, Ironside, Kettle,
+  Lark, Marsh, Mill, Moss, Nettle, Oak, Pike, Quarry,
+  Reed, Ridge, Rook, Rowe, Rush, Sable, Shaw, Slate,
+  Stone, Storm, Thorn, Tide, Vale, Wade, Ward, Weller,
+  Whit, Wilde, Wolfe, Wood, Yew, Ash, Bell, Bramble,
+  Briar, Burrow, Carver, Chandler, Cooper, Fletcher, Fowler, Mason,
+  Miller, Potter, Sawyer, Smith, Tanner, Thatcher, Turner, Weaver,
+  Wright, Brightwater, Coldwell, Deepdale, Hillcrest, Longstride, Oakheart, Redfern,
+  Silverbrook, Stonebrook, Westmoor, Underhill, Greenleaf
+]

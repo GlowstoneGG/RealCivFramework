@@ -1,0 +1,57 @@
+# Rank gates for the rank-gates module. Ranks: novice, apprentice, journeyman, expert, master, grandmaster.
+# Block and enchantment ids may leave out "minecraft:". Changes apply after a restart.
+
+# Blocks that drop nothing, not even XP orbs, unless the player has this Miner rank. The block still breaks,
+# and still pays Miner XP, so players can work their way up.
+mining:
+  apprentice:
+    - gold_ore
+    - deepslate_gold_ore
+    - nether_gold_ore
+    - redstone_ore
+    - deepslate_redstone_ore
+    - lapis_ore
+    - deepslate_lapis_ore
+  journeyman:
+    - diamond_ore
+    - deepslate_diamond_ore
+    - emerald_ore
+    - deepslate_emerald_ore
+  expert:
+    - ancient_debris
+
+# Workstations and containers that only open for these professions and ranks. A block listed under several
+# professions opens for anyone who meets one of them. Blocks not listed open for everyone. Creative mode skips this.
+stations:
+  blacksmith:
+    apprentice:
+      - anvil
+      - chipped_anvil
+      - damaged_anvil
+      - smithing_table
+      - grindstone
+    journeyman:
+      - blast_furnace
+  healer:
+    apprentice:
+      - brewing_stand
+  builder:
+    apprentice:
+      - stonecutter
+  farmer:
+    apprentice:
+      - smoker
+
+# The highest enchantment level each Librarian rank can apply, at an enchanting table or by anvil.
+# 0 means none. Ranks left out have no limit.
+enchanting:
+  max-level:
+    novice: 0
+    apprentice: 0
+    journeyman: 1
+    expert: 2
+    master: 3
+  # Only Grandmasters can apply these, at any level.
+  grandmaster-only:
+    - mending
+    - infinity

@@ -1,0 +1,16 @@
+name: RealCivFramework
+version: '${version}'
+main: gg.glowstone.rcf.folia.RealCivFrameworkPlugin
+description: Real Civ Framework, a forkable RealCiv framework for Folia and Canvas
+authors: [GlowstoneGG]
+website: https://github.com/GlowstoneGG/RealCivFramework
+api-version: '26.3'
+folia-supported: true
+
+permissions:
+  rcf.professionxp:
+    description: Manage player profession XP
+    default: op
+  rcf.names.admin:
+    description: Set, reroll and look up players' generated names (/setname, /rerollname, /realname)
+    default: op
