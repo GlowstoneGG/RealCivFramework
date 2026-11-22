@@ -66,7 +66,7 @@ internal object Downed : Module("downed") {
         if (!end(player)) return
         player.health = health.coerceIn(1.0, player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)?.value ?: 20.0)
         player.leaveVehicle()
-        player.sendActionBar(Component.text("You've been revived", NamedTextColor.GREEN))
+        ctx.actionBar.show(player, "revive", Component.text("You've been revived", NamedTextColor.GREEN))
     }
 
     private fun down(player: Player, ticks: Int) {

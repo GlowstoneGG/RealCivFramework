@@ -24,6 +24,9 @@ internal object Revive : Module("revive", dependsOn = listOf(Downed)) {
     private const val PERIOD = 5L
     private const val BANDAGE_COOLDOWN_MS = 7_500L
 
+    // Just over two redraws, so the bar drops soon after the channel ends.
+    private const val PROGRESS_MS = 600L
+
     private val channelling = ConcurrentHashMap.newKeySet<UUID>()
     private val lastBandage = ConcurrentHashMap<UUID, Long>()
 
@@ -38,15 +41,15 @@ internal object Revive : Module("revive", dependsOn = listOf(Downed)) {
                 target.location.distanceSquared(healer.location) <= REACH_SQUARED
             if (!healer.isSneaking || !inReach || !Downed.isDowned(target.uniqueId)) {
                 channelling.remove(healer.uniqueId)
-                healer.sendActionBar(Component.text("Revive interrupted", NamedTextColor.RED))
+                ctx.actionBar.show(healer, "revive", Component.text("Revive interrupted", NamedTextColor.RED))
                 task.cancel()
                 return@runAtFixedRate
             }
             elapsed += PERIOD.toInt()
             if (elapsed < total) {
                 val progress = Component.text("Reviving ${target.name} ${progressBar(elapsed, total)}", NamedTextColor.GREEN)
-                healer.sendActionBar(progress)
-                target.sendActionBar(Component.text("${healer.name} is reviving you ${progressBar(elapsed, total)}", NamedTextColor.GREEN))
+                ctx.actionBar.show(healer, "revive", progress, ttlMs = PROGRESS_MS)
+                ctx.actionBar.show(target, "revive", Component.text("${healer.name} is reviving you ${progressBar(elapsed, total)}", NamedTextColor.GREEN), ttlMs = PROGRESS_MS)
                 return@runAtFixedRate
             }
             channelling.remove(healer.uniqueId)
@@ -65,7 +68,7 @@ internal object Revive : Module("revive", dependsOn = listOf(Downed)) {
         if (restored <= 0.0) return
         lastBandage[healer.uniqueId] = now
         target.health += restored
-        target.sendActionBar(Component.text("${healer.name} bandaged you", NamedTextColor.GREEN))
+        ctx.actionBar.show(target, "revive", Component.text("${healer.name} bandaged you", NamedTextColor.GREEN))
         ctx.award(healer, Healer, 5.0)
     }
 

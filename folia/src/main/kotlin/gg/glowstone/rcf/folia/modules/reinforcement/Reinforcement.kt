@@ -63,18 +63,18 @@ internal object Reinforcement : Module("reinforcement") {
             if (!reinforceable(block)) return
             val existing = ReinforcementStore.tier(block)
             if (existing != null && existing >= tier) {
-                player.sendActionBar(Component.text("Already reinforced (${existing.label()})"))
+                ctx.actionBar.show(player, "reinforcement", Component.text("Already reinforced (${existing.label()})"))
                 return
             }
             if (ctx.rank(player, Builder) < tier.requiredRank) {
-                player.sendActionBar(Component.text("${tier.label()} reinforcement needs Builder ${tier.requiredRank.displayName}"))
+                ctx.actionBar.show(player, "reinforcement", Component.text("${tier.label()} reinforcement needs Builder ${tier.requiredRank.displayName}"))
                 return
             }
             val creative = player.gameMode == GameMode.CREATIVE
             if (tier == Tier.WOODEN) {
                 val plank = player.inventory.contents.firstOrNull { it != null && it.type.name.endsWith("_PLANKS") }
                 if (plank == null && !creative) {
-                    player.sendActionBar(Component.text("Wooden reinforcement uses a plank"))
+                    ctx.actionBar.show(player, "reinforcement", Component.text("Wooden reinforcement uses a plank"))
                     return
                 }
                 if (!creative) plank!!.amount -= 1
@@ -89,7 +89,7 @@ internal object Reinforcement : Module("reinforcement") {
                 Tier.WOODEN -> if (ctx.rank(player, Builder) == SkillLevel.NOVICE) 4.0 else 1.0
             }
             ctx.award(player, Builder, xp)
-            player.sendActionBar(Component.text("Reinforced (${tier.label()})"))
+            ctx.actionBar.show(player, "reinforcement", Component.text("Reinforced (${tier.label()})"))
         }
 
         @EventHandler(ignoreCancelled = true)
@@ -112,7 +112,7 @@ internal object Reinforcement : Module("reinforcement") {
             if (ReinforcementStore.tier(event.block) == null) return
             if (!event.player.inventory.itemInMainHand.type.name.endsWith("_PICKAXE")) {
                 event.isCancelled = true
-                event.player.sendActionBar(Component.text("This block is reinforced; you need a pickaxe"))
+                ctx.actionBar.show(event.player, "reinforcement", Component.text("This block is reinforced; you need a pickaxe"))
             }
         }
 

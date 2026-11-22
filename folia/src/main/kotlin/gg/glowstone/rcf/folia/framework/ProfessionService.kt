@@ -12,7 +12,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /** Player PDC is the source of truth; callers must be on the player's owning region. */
-internal class ProfessionService(val catalog: ProfessionCatalog) {
+internal class ProfessionService(val catalog: ProfessionCatalog, private val actionBar: ActionBar) {
     // Fixed namespace so forks that rename the plugin keep player data.
     private val keys = catalog.professions.associate { it.id to NamespacedKey(NAMESPACE, "profession_xp_${it.id}") }
 
@@ -48,7 +48,7 @@ internal class ProfessionService(val catalog: ProfessionCatalog) {
         if (applied == 0.0) return 0.0
         save(player, progress, profession.id)
         if (notify) {
-            player.sendActionBar(Component.text("${profession.displayName} ${if (applied > 0) "+" else ""}${applied.formatXp()} XP", TextColor.color(profession.color)))
+            actionBar.show(player, "xp-${profession.id}", Component.text("${profession.displayName} ${if (applied > 0) "+" else ""}${applied.formatXp()} XP", TextColor.color(profession.color)))
         }
         announceRankChanges(player, before, progress)
         return applied

@@ -3,6 +3,7 @@ package gg.glowstone.rcf.folia.modules.survival
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import io.papermc.paper.datacomponent.DataComponentTypes
+import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -101,7 +102,7 @@ internal object Fullness : Module("fullness") {
             val fullness = player.fullness()
             if (fullness + gain > MAX) {
                 event.isCancelled = true
-                player.sendActionBar("You're too full to eat that")
+                ctx.actionBar.show(player, "fullness", Component.text("You're too full to eat that"))
                 return
             }
             meals.addLast(event.item.type)

@@ -66,7 +66,7 @@ internal object ArmorWeight : Module("armor-weight") {
         val band = band(total)
         val previous = bands.put(player.uniqueId, band)
         if (previous != null && previous != band) {
-            player.sendActionBar(Component.text("Armour: ${band.name.lowercase().replaceFirstChar(Char::uppercase)}"))
+            ctx.actionBar.show(player, "armor-weight", Component.text("Armour: ${band.name.lowercase().replaceFirstChar(Char::uppercase)}"), status = true)
         }
     }
 

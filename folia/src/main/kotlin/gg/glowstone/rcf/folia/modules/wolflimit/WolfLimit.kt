@@ -58,7 +58,7 @@ internal object WolfLimit : Module("wolf-limit") {
                 if (count < limit) return
                 event.isCancelled = true
                 val message = if (limit == 0) "You need Hunter Apprentice to tame a wolf" else "Your Hunter rank lets you keep $limit wolves, and you have $count"
-                owner.sendActionBar(Component.text(message, NamedTextColor.RED))
+                ctx.actionBar.show(owner, "wolf-limit", Component.text(message, NamedTextColor.RED))
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
