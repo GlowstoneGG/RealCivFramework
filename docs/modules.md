@@ -102,7 +102,17 @@ Needs `combat-tag`. Logging out while tagged leaves your body standing where you
 
 ## armor-weight
 
-Armour has weight: material (leather 1, turtle 1.5, chainmail or copper 2, gold 2.5, iron 3, diamond 5, netherite 6) times slot (helmet 5, chestplate 8, leggings 7, boots 4). Each point of weight slows you by 0.1%, so full iron (72) is about 7% slower. The action bar shows your load when it changes: Light, Medium, Heavy or Overloaded. Sprint-jumping more than 3 times in 4 seconds at Medium or heavier gives Slowness I for 2 seconds.
+Armour has weight: material (leather 1, turtle 1.5, chainmail or copper 2, gold 2.5, iron 3, diamond 5, netherite 6) times slot (helmet 5, chestplate 8, leggings 7, boots 4). Each point of weight slows you by 0.1%, so full iron (72) is about 7% slower. The action bar shows your load when it changes: Light, Medium, Heavy or Overloaded. Sprint-jumping more than 3 times in 4 seconds at Medium or heavier gives Slowness I for 2 seconds. With `stamina` on, this Slowness is replaced by heavier armour draining stamina faster.
+
+## stamina
+
+Stamina runs from 0 to 100 and is shown on the XP bar while it isn't full (your level number stays as it is). It's for bursts: sprinting and sprint-swimming cost 3 per second, sprint-jumps 1, landed melee hits 4, and blocking with a shield 2 per point of damage blocked (at most 20). Walking, plain jumps, swimming, mining, building, farming, bows, elytras and riding cost nothing.
+
+- Armour makes sprinting and sprint-jumping cost more: 1% per point of weight (from `armor-weight`). Unarmoured you can sprint for 33 seconds, in full iron about 19, in netherite about 14.
+- Stamina comes back 1 second after you last spent any: 6 per second standing still, sneaking or riding, and 3 per second walking, doubling over 5 seconds of unbroken rest. A full refill takes about 11 seconds standing. Every 100 stamina regained costs 1 fullness, and below 30 fullness it comes back at half speed.
+- At 0 you're Winded until you're back to 25: 30% slower, melee hits deal half damage, and a block that empties you puts your shield down for 5 seconds. You can always still jump.
+- Hunters spend 8% less on sprinting, jumping and melee per rank (40% less at Grandmaster). Carrying a downed player doubles sprint costs, 20% less per Healer rank, and you don't recover while moving.
+- You're full on joining and after respawning. Downed players don't recover; when revived they have 25. Creative, spectator, flying and spawn grace don't drain.
 
 ## armor-shield
 
