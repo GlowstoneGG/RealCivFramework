@@ -7,17 +7,16 @@ import kotlin.test.assertTrue
 
 class RecentBlockActionsTest {
     @Test
-    fun `placed mining blocks are suppressed once and the marker expires`() {
+    fun `placed breaks are remembered for ten seconds`() {
         var now = 1000L
-        val recent = RecentBlockActions(ttlMillis = 100, clock = { now })
+        val recent = RecentBlockActions(clock = { now })
         val position = RecentBlockActions.Position(UUID.randomUUID(), 1, 64, 2)
-        recent.markPlaced(position)
-        assertTrue(recent.wasPlaced(position))
+        assertFalse(recent.wasPlacedBreak(position))
+        recent.markPlacedBreak(position)
         assertTrue(recent.wasPlacedBreak(position))
-        assertFalse(recent.wasPlaced(position))
-        recent.markPlaced(position)
-        now += 101
-        assertFalse(recent.wasPlaced(position))
+        assertTrue(recent.wasPlacedBreak(position))
+        now += 10_000
+        assertFalse(recent.wasPlacedBreak(position))
     }
 
     @Test

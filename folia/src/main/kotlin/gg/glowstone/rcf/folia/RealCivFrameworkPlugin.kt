@@ -9,12 +9,12 @@ import gg.glowstone.rcf.folia.framework.ProfessionCatalog
 import gg.glowstone.rcf.folia.framework.ProfessionCommands
 import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.ModuleConfig
+import gg.glowstone.rcf.folia.framework.PlacedBlocks
 import gg.glowstone.rcf.folia.framework.ProfessionService
 import gg.glowstone.rcf.folia.framework.RecipeConfig
 import gg.glowstone.rcf.folia.framework.RecipeGate
 import gg.glowstone.rcf.folia.modules.allModules
 import gg.glowstone.rivet.Lifecycle
-import gg.glowstone.rcf.core.blocks.RecentBlockActions
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.coroutines.ContinuationInterceptor
 
@@ -41,11 +41,12 @@ class RealCivFrameworkPlugin : SuspendingJavaPlugin() {
         }
         val actionBar = ActionBar(this)
         val professions = ProfessionService(catalog, actionBar)
-        val ctx = CivContext(this, professions, RecentBlockActions(), actionBar)
+        val ctx = CivContext(this, professions, PlacedBlocks(), actionBar)
         val recipes = RecipeGate(this, professions, actionBar)
         ProfessionCommands(this, professions).register()
         server.pluginManager.registerEvents(actionBar, this)
         server.pluginManager.registerEvents(ctx, this)
+        server.pluginManager.registerEvents(ctx.blocks, this)
         server.pluginManager.registerEvents(recipes, this)
         for (player in server.onlinePlayers) player.scheduler.run(this, {
             professions.refresh(player)
