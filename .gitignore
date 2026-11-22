@@ -1,8 +1,36 @@
+# Build output
 .gradle/
 **/build/
+.kotlin/
+out/
+
+# Editors and OS
 .idea/
 *.iml
+.vscode/
+.fleet/
 .DS_Store
+
+# Local test servers
 run/
-.kotlin/
+
+# JVM crash and heap dumps
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+*.pem
+local.properties
+.claude/settings.local.json
 .claude/worktrees/
+
+# Logs
+*.log
+logs/
+
+# Node tools
+node_modules/

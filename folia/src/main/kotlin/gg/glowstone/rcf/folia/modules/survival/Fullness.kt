@@ -112,9 +112,12 @@ internal object Fullness : Module("fullness") {
 
         @EventHandler
         fun onRespawn(event: PlayerRespawnEvent) {
+            // Leaving the End also fires a respawn; only death resets fullness.
+            if (event.respawnReason != PlayerRespawnEvent.RespawnReason.DEATH) return
             val player = event.player
+            recentMeals.remove(player.uniqueId)
             // Vanilla refills the food bar after this event, so apply ours a tick later.
-            player.scheduler.runDelayed(ctx.plugin, { player.setFullness(maxOf(player.fullness(), START)) }, null, 1L)
+            player.scheduler.runDelayed(ctx.plugin, { player.setFullness(START) }, null, 1L)
         }
     })
 }

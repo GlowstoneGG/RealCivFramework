@@ -53,7 +53,7 @@ Right-click a block with a reinforcement item to make it harder to break.
 
 ## fullness
 
-Replaces vanilla hunger with fullness from 0 to 100, shown on the food bar (each drumstick is 10 fullness). New players start at 40, and it drains 0.05 per second, so a full bar lasts about 33 minutes. Food adds 5 fullness per point of nutrition, but each time the same food appears in your last 5 meals it gives 20% less (at most 80% less). You can't eat something that would take you over 100. After respawning you have at least 40. At 0 you starve as in vanilla. If `no-natural-regen` is off, vanilla healing from a full bar costs 7.5 fullness per HP.
+Replaces vanilla hunger with fullness from 0 to 100, shown on the food bar (each drumstick is 10 fullness). New players start at 40, and it drains 0.05 per second, so a full bar lasts about 33 minutes. Food adds 5 fullness per point of nutrition, but each time the same food appears in your last 5 meals it gives 20% less (at most 80% less). You can't eat something that would take you over 100. Dying resets you to 40 and forgets your recent meals. At 0 you starve as in vanilla. If `no-natural-regen` is off, vanilla healing from a full bar costs 7.5 fullness per HP.
 
 ## no-natural-regen
 
@@ -141,7 +141,7 @@ Works without the `downed` module; then only the Hunter search applies.
 
 ## spawn-grace
 
-New players, and players who die and respawn at world spawn (no bed or anchor, including one that went missing), get 3 minutes 30 seconds of spawn grace, shown as a pink bar. During it mobs can't target them and damage from mobs is cancelled. Other players can still hurt them, and so can the world: fire, lava, drowning, starving and so on. Falling doesn't end grace, but any of these do:
+New players, and players who die and respawn (at world spawn, a bed or an anchor), get 3 minutes 30 seconds of spawn grace, shown as a pink bar. During it mobs can't target them and damage from mobs is cancelled. Other players can still hurt them, and so can the world: fire, lava, drowning, starving and so on. Falling doesn't end grace, but any of these do:
 
 - being hit by a player, or by a player's projectile, even a snowball
 - dealing damage to anything

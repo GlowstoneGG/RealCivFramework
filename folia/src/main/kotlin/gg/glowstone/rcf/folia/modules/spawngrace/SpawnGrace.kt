@@ -28,7 +28,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * New players, and players respawning at world spawn, get 3½ minutes in which mobs ignore them and only players can hurt them.
+ * New players, and players respawning after death, get 3½ minutes in which mobs ignore them and only players can hurt them.
  * Fighting, taking non-fall damage, or earning profession XP ends it early.
  */
 internal object SpawnGrace : Module("spawn-grace") {
@@ -95,13 +95,11 @@ internal object SpawnGrace : Module("spawn-grace") {
             }
         }
 
-        // Only death respawns at world spawn: no bed or anchor, and none that went missing.
+        // Leaving the End also fires a respawn; only death grants grace.
         @EventHandler(priority = EventPriority.MONITOR)
         fun onRespawn(event: PlayerRespawnEvent) {
             if (event.respawnReason != PlayerRespawnEvent.RespawnReason.DEATH) return
-            if (event.isBedSpawn || event.isAnchorSpawn || event.isMissingRespawnBlock) return
             val player = event.player
-            if (player.respawnLocation != null) return
             player.scheduler.run(ctx.plugin, { grant(player, System.currentTimeMillis() + DURATION_MS, announce = true) }, null)
         }
 
