@@ -115,7 +115,10 @@ internal object Downed : Module("downed") {
         if (Bukkit.isOwnedByCurrentRegion(at)) return player.sendBlockChange(at, at.block.blockData)
         Bukkit.getRegionScheduler().run(ctx.plugin, at) {
             val data = at.block.blockData
-            player.scheduler.run(ctx.plugin, { player.sendBlockChange(at, data) }, null)
+            player.scheduler.run(ctx.plugin, {
+                // Skip if they changed world (the client dropped the old one) or a barrier is back on that spot.
+                if (player.world == at.world && downed[player.uniqueId]?.barrier != at) player.sendBlockChange(at, data)
+            }, null)
         }
     }
 
