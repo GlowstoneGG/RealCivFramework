@@ -1,4 +1,4 @@
-# Real Civ Framework
+<p align="center"><img src=".github/readme-banner.png" alt="Real Civ Framework, a Glowstone project" width="100%"></p>
 
 Real Civ Framework is an open-source framework for building **RealCiv** servers on Minecraft (Folia and Canvas), built to be forked, modified, and extended. It ships with a default set of professions you can keep, rebalance, or replace.
 
@@ -24,7 +24,7 @@ To change the game, start your own copy and edit or add modules. See [docs/modul
 
 Players use `/profession [id]` (also `/prof` or `/class`). Operators use `/professionxp list|add|set|clear` (also `/classxp`), which needs `rcf.professionxp`.
 
-Several modules are inspired by the [Civlabs](https://github.com/Emergent-Civilization/CivlabsPublic) servers' mechanics. They are independent implementations; no Civlabs code is included.
+Several modules are inspired by the [Civlabs](https://civlabs.org) servers' mechanics. They are independent implementations; no Civlabs code is included.
 
 <!-- template:start -->
 ## Starting your own server from this template

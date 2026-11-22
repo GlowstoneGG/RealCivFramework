@@ -36,6 +36,10 @@ for source_set in core/src/main core/src/test folia/src/main folia/src/test; do
 done
 git mv "folia/src/main/kotlin/$new_path/folia/RealCivFrameworkPlugin.kt" "folia/src/main/kotlin/$new_path/folia/${name}Plugin.kt"
 
+# The banner and share image are RCF branding: swap the banner for a plain heading (renamed below) and drop both.
+perl -pi -e 's{^<p align="center"><img src="\.github/readme-banner\.png".*$}{# Real Civ Framework}' README.md
+git rm -q .github/readme-banner.png .github/og-image.png
+
 # Package first, then the remaining mentions: class names, plugin name, permissions, namespace.
 files=$(git ls-files '*.kt' '*.kts' '*.yml' '*.md' | grep -v '^LICENSE')
 NAME=$name ID=$id PKG=$package PKG_PATH=$new_path perl -pi -e '
