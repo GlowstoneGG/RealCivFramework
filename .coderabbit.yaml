@@ -1,0 +1,4 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+reviews:
+  # Approve once comments are resolved; main's ruleset needs 1 approval before CodeRabbit can merge.
+  request_changes_workflow: true
