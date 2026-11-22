@@ -2,7 +2,6 @@ package gg.glowstone.rcf.folia.modules.professions
 
 import gg.glowstone.rcf.folia.framework.Profession
 import gg.glowstone.rcf.folia.framework.CivContext
-import gg.glowstone.rcf.folia.framework.position
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -25,7 +24,7 @@ internal object Builder : Profession(
         fun onPlace(event: BlockPlaceEvent) {
             val block = event.block
             if (!block.type.isSolid || block.type in cheapBlocks) return
-            if (ctx.blocks.allowBuilderAward(event.player.uniqueId, block.position())) {
+            if (ctx.blocks.allowBuilderAward(event.player.uniqueId, block)) {
                 ctx.award(event.player, Builder, 1.0, cooldownMs = 5_000)
             }
         }

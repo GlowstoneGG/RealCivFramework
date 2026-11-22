@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
 internal class CivContext(
     val plugin: RealCivFrameworkPlugin,
     val professions: ProfessionService,
-    val blocks: RecentBlockActions,
+    val blocks: PlacedBlocks,
     val actionBar: ActionBar,
 ) : Listener {
     private data class CooldownKey(val player: UUID, val key: String)
