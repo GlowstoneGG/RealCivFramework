@@ -35,7 +35,7 @@ internal class PlacedBlocks(private val recent: RecentBlockActions = RecentBlock
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlace(event: BlockPlaceEvent) {
-        set(event.block, true)
+        occupy(event.block, true)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -71,7 +71,7 @@ internal class PlacedBlocks(private val recent: RecentBlockActions = RecentBlock
         when {
             falling == null -> set(event.block, false)
             event.to.isAir -> if (set(event.block, false)) falling.persistentDataContainer.set(fallingKey, PersistentDataType.BOOLEAN, true)
-            else -> set(event.block, falling.persistentDataContainer.has(fallingKey))
+            else -> occupy(event.block, falling.persistentDataContainer.has(fallingKey))
         }
     }
 
@@ -79,7 +79,13 @@ internal class PlacedBlocks(private val recent: RecentBlockActions = RecentBlock
         val facing = (event.block.blockData as? Directional)?.facing ?: return
         val direction = if (pushing) facing else facing.oppositeFace
         val placed = blocks.map { set(it, false) }
-        blocks.forEachIndexed { i, block -> set(block.getRelative(direction), placed[i]) }
+        blocks.forEachIndexed { i, block -> occupy(block.getRelative(direction), placed[i]) }
+    }
+
+    /** A new block took this position: drop any note about the block that broke there, then set its bit. */
+    private fun occupy(block: Block, placed: Boolean) {
+        recent.forgetPlacedBreak(block.position())
+        set(block, placed)
     }
 
     private fun key(block: Block) = civKey("placed_${PlacedBits.section(block.y)}")

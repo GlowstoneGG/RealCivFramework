@@ -19,6 +19,12 @@ class RecentBlockActions(
         remember(placedBreaks, position)
     }
 
+    /** Called when a new block takes the position, so it isn't mistaken for the one that broke. */
+    @Synchronized
+    fun forgetPlacedBreak(position: Position) {
+        placedBreaks.remove(position)
+    }
+
     /** True for 10 seconds after a placed block at this position broke. */
     @Synchronized
     fun wasPlacedBreak(position: Position): Boolean {

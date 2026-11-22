@@ -17,6 +17,9 @@ class RecentBlockActionsTest {
         assertTrue(recent.wasPlacedBreak(position))
         now += 10_000
         assertFalse(recent.wasPlacedBreak(position))
+        recent.markPlacedBreak(position)
+        recent.forgetPlacedBreak(position)
+        assertFalse(recent.wasPlacedBreak(position))
     }
 
     @Test
