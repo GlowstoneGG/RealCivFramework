@@ -39,10 +39,11 @@ internal class ActionBar(private val plugin: Plugin) : Listener {
     private fun draw(player: Player) {
         val live = slots[player.uniqueId] ?: return
         val now = System.currentTimeMillis()
-        live.values.removeIf { it.expiresAt <= now }
+        val expired = live.values.removeIf { it.expiresAt <= now }
         // Sorted by slot name after status, so lines hold their place between redraws.
         val lines = live.entries.sortedWith(compareBy({ !it.value.status }, { it.key })).map { it.value.text }
-        if (lines.isNotEmpty()) player.sendActionBar(Component.join(JoinConfiguration.separator(SEPARATOR), lines))
+        // One empty send when the last slot expires, so the line drops now instead of on the client's fade.
+        if (lines.isNotEmpty() || expired) player.sendActionBar(Component.join(JoinConfiguration.separator(SEPARATOR), lines))
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
