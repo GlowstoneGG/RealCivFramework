@@ -138,7 +138,7 @@ internal object Stamina : Module("stamina") {
                 state.wasDowned = false
                 refill(player, state, REVIVED_AT)
             }
-            val sprinting = player.isSprinting && moved >= SPRINT_MIN_MOVE * SPRINT_MIN_MOVE && !state.winded
+            val sprinting = player.isSprinting && !player.isInsideVehicle && moved >= SPRINT_MIN_MOVE * SPRINT_MIN_MOVE && !state.winded
             if (sprinting) spend(player, SPRINT_PER_SECOND * SECONDS_PER_TICK * player.sprintMultiplier())
             regen(player, state, sprinting, moved >= WALK_MIN_MOVE * WALK_MIN_MOVE)
             if (state.winded && state.value >= WINDED_UNTIL) setWinded(player, state, false)
@@ -150,7 +150,7 @@ internal object Stamina : Module("stamina") {
         val idle = state.tick - state.lastCostAt
         if (state.value >= MAX || idle < REGEN_DELAY_TICKS) return
         if (sprinting || player.isGliding || (moving && Carry.isCarrying(player.uniqueId))) return
-        val base = if (moving && !player.isInsideVehicle) REGEN_WALKING else REGEN_STANDING
+        val base = if (moving && !player.isInsideVehicle && !player.isSneaking) REGEN_WALKING else REGEN_STANDING
         val hungry = Fullness.enabled && Fullness.level(player) < LOW_FULLNESS
         val rest = (idle - REGEN_DELAY_TICKS) / 20.0
         val gain = (regenRate(base, rest, hungry) * SECONDS_PER_TICK).coerceAtMost(MAX - state.value)
