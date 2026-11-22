@@ -46,6 +46,12 @@ internal object Fullness : Module("fullness") {
         saturation = 0f
     }
 
+    /** Callers must be on the player's region. */
+    fun level(player: Player): Double = player.fullness()
+
+    /** Callers must be on the player's region. */
+    fun spend(player: Player, amount: Double) = player.setFullness(player.fullness() - amount)
+
     /** Callers must be on the player's region. The task retires when the player leaves. */
     private fun track(player: Player) {
         player.setFullness(player.fullness())

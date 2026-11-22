@@ -30,6 +30,9 @@ internal object Carry : Module("carry", dependsOn = listOf(Downed)) {
     private val carrying = ConcurrentHashMap<UUID, Player>()
     private val releasing = ConcurrentHashMap.newKeySet<UUID>()
 
+    /** Safe from any thread; reads false when this module is off. */
+    fun isCarrying(carrier: UUID): Boolean = carrying.containsKey(carrier)
+
     private fun pickUp(carrier: Player, target: Player) {
         if (!carrier.addPassenger(target)) return
         carrying[carrier.uniqueId] = target

@@ -24,6 +24,9 @@ internal abstract class Module(
     lateinit var ctx: CivContext
         private set
 
+    /** True once this module is switched on in `modules.yml` and bound. Lets other modules read it softly. */
+    val enabled: Boolean get() = ::ctx.isInitialized
+
     open fun listeners(ctx: CivContext): List<Listener> = emptyList()
 
     /** Runs once after listeners are registered, on the global region thread. */

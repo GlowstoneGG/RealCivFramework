@@ -5,6 +5,7 @@ import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import gg.glowstone.rcf.folia.modules.stamina.Stamina
 import net.kyori.adventure.text.Component
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
@@ -35,6 +36,10 @@ internal object ArmorWeight : Module("armor-weight") {
 
     private val bands = ConcurrentHashMap<UUID, Band>()
     private val jumps = ConcurrentHashMap<UUID, ArrayDeque<Long>>()
+    private val weights = ConcurrentHashMap<UUID, Double>()
+
+    /** Total armour weight. Safe from any thread; reads 0 when this module is off. */
+    fun weight(player: UUID): Double = weights[player] ?: 0.0
 
     private fun weight(item: ItemStack?): Double {
         val name = item?.type?.name ?: return 0.0
@@ -58,6 +63,7 @@ internal object ArmorWeight : Module("armor-weight") {
         val speed = player.getAttribute(Attribute.MOVEMENT_SPEED) ?: return
         speed.removeModifier(key)
         if (total > 0) speed.addTransientModifier(AttributeModifier(key, -total / 1000, AttributeModifier.Operation.ADD_SCALAR))
+        weights[player.uniqueId] = total
         val band = band(total)
         val previous = bands.put(player.uniqueId, band)
         if (previous != null && previous != band) {
@@ -78,6 +84,8 @@ internal object ArmorWeight : Module("armor-weight") {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onJump(event: PlayerJumpEvent) {
+            // Stamina charges heavier armour for sprint-jumps instead.
+            if (Stamina.enabled) return
             val player = event.player
             if (!player.isSprinting || (bands[player.uniqueId] ?: Band.LIGHT) == Band.LIGHT) return
             val now = System.currentTimeMillis()
@@ -91,6 +99,7 @@ internal object ArmorWeight : Module("armor-weight") {
         fun onQuit(event: PlayerQuitEvent) {
             bands.remove(event.player.uniqueId)
             jumps.remove(event.player.uniqueId)
+            weights.remove(event.player.uniqueId)
         }
     })
 }

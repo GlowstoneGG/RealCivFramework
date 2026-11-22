@@ -17,6 +17,7 @@ import gg.glowstone.rcf.folia.modules.rankgates.RankGates
 import gg.glowstone.rcf.folia.modules.reinforcement.Reinforcement
 import gg.glowstone.rcf.folia.modules.revive.Revive
 import gg.glowstone.rcf.folia.modules.spawngrace.SpawnGrace
+import gg.glowstone.rcf.folia.modules.stamina.Stamina
 import gg.glowstone.rcf.folia.modules.survival.BedOwnership
 import gg.glowstone.rcf.folia.modules.survival.CampfireRest
 import gg.glowstone.rcf.folia.modules.survival.Fullness
@@ -39,6 +40,7 @@ internal val allModules = listOf(
     CombatTag,
     CombatLog,
     ArmorWeight,
+    Stamina,
     ArmorShield,
     HunterRanged,
     Instinct,
