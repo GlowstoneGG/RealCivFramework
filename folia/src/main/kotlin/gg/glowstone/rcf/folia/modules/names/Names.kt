@@ -7,7 +7,6 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument
 import dev.jorel.commandapi.arguments.StringArgument
 import dev.jorel.commandapi.executors.CommandExecutor
 import dev.jorel.commandapi.executors.PlayerCommandExecutor
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -57,7 +56,7 @@ internal object Names : Module("names", enabledByDefault = false) {
     private lateinit var pool: NamePool
     private lateinit var dataFile: File
 
-    private fun load(ctx: CivContext) {
+    private fun load() {
         val namesFile = ctx.plugin.dataFolder.resolve("names.yml")
         if (!namesFile.exists()) ctx.plugin.saveResource("names.yml", false)
         val names = YamlConfiguration.loadConfiguration(namesFile)
@@ -281,8 +280,8 @@ internal object Names : Module("names", enabledByDefault = false) {
             .register()
     }
 
-    override fun listeners(ctx: CivContext): List<Listener> {
-        load(ctx)
+    override fun listeners(): List<Listener> {
+        load()
         return listOf(object : Listener {
             @EventHandler(priority = EventPriority.HIGH)
             fun onPreLogin(event: AsyncPlayerPreLoginEvent) {
@@ -314,7 +313,7 @@ internal object Names : Module("names", enabledByDefault = false) {
         })
     }
 
-    override fun start(ctx: CivContext) = registerCommands()
+    override fun start() = registerCommands()
 
     override fun stop() {
         if (::dataFile.isInitialized) write()

@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.spawngrace
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.ProfessionXpGainEvent
 import gg.glowstone.rcf.folia.framework.civKey
@@ -84,7 +83,7 @@ internal object SpawnGrace : Module("spawn-grace") {
     private fun EntityDamageByEntityEvent.attackingPlayer(): Player? =
         damager as? Player ?: (damager as? Projectile)?.shooter as? Player ?: damageSource.causingEntity as? Player
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler
         fun onJoin(event: PlayerJoinEvent) {
             val player = event.player

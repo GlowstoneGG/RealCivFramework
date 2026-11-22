@@ -27,10 +27,10 @@ internal abstract class Module(
     /** True once this module is switched on in `modules.yml` and bound. Lets other modules read it softly. */
     val enabled: Boolean get() = ::ctx.isInitialized
 
-    open fun listeners(ctx: CivContext): List<Listener> = emptyList()
+    open fun listeners(): List<Listener> = emptyList()
 
     /** Runs once after listeners are registered, on the global region thread. */
-    open fun start(ctx: CivContext) {}
+    open fun start() {}
 
     /** Runs on plugin disable, in reverse start order. */
     open fun stop() {}
@@ -39,8 +39,8 @@ internal abstract class Module(
     val enable: Phase by phase(after = dependsOn.map { it.enable }) {
         val ctx = ctx
         val manager = ctx.plugin.server.pluginManager
-        for (listener in professions.flatMap { it.listeners(ctx) } + listeners(ctx)) manager.registerEvents(listener, ctx.plugin)
-        start(ctx)
+        for (listener in professions.flatMap { it.listeners(ctx) } + listeners()) manager.registerEvents(listener, ctx.plugin)
+        start()
     }
 
     init {

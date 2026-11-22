@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.corpses
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import io.papermc.paper.datacomponent.item.ResolvableProfile
@@ -54,7 +53,7 @@ internal object Corpses : Module("corpses") {
         }, null, delay)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onDeath(event: PlayerDeathEvent) {
             val drops = event.drops.filterNot { it.isEmpty }

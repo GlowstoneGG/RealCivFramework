@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.survival
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -66,11 +65,11 @@ internal object Fullness : Module("fullness") {
     fun mealGain(nutrition: Int, recentRepeats: Int): Double =
         nutrition * GAIN_PER_NUTRITION * (1.0 - 0.2 * recentRepeats.coerceAtMost(4))
 
-    override fun start(ctx: CivContext) {
+    override fun start() {
         for (player in ctx.plugin.server.onlinePlayers) player.scheduler.run(ctx.plugin, { track(player) }, null)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler
         fun onJoin(event: PlayerJoinEvent) = track(event.player)
 

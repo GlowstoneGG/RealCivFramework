@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.downed
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.stamina.Stamina
@@ -128,7 +127,7 @@ internal object Downed : Module("downed") {
         if (player != null && isDowned(player.uniqueId)) isCancelled = true
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onDamage(event: EntityDamageEvent) {
             val player = event.entity as? Player ?: return

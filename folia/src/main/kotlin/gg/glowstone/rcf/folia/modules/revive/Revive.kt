@@ -1,7 +1,6 @@
 package gg.glowstone.rcf.folia.modules.revive
 
 import gg.glowstone.rcf.core.professions.SkillLevel
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.modules.downed.Downed
 import gg.glowstone.rcf.folia.modules.professions.Healer
@@ -75,7 +74,7 @@ internal object Revive : Module("revive", dependsOn = listOf(Downed)) {
         return "▮".repeat(filled) + "▯".repeat(10 - filled)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(ignoreCancelled = true)
         fun onInteract(event: PlayerInteractEntityEvent) {
             val healer = event.player

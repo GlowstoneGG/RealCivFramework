@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.combattag
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import net.kyori.adventure.bossbar.BossBar
@@ -51,7 +50,7 @@ internal object CombatTag : Module("combat-tag") {
         }, { bars.remove(player.uniqueId, bar) }, 1L, 20L)
     }
 
-    override fun listeners(ctx: CivContext) = listOf(object : Listener {
+    override fun listeners() = listOf(object : Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onHit(event: EntityDamageByEntityEvent) {
             val victim = event.entity as? Player ?: return

@@ -1,6 +1,5 @@
 package gg.glowstone.rcf.folia.modules.wolflimit
 
-import gg.glowstone.rcf.folia.framework.CivContext
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.modules.professions.Hunter
 import net.kyori.adventure.text.Component
@@ -46,7 +45,7 @@ internal object WolfLimit : Module("wolf-limit") {
         ctx.plugin.server.asyncScheduler.runNow(ctx.plugin) { write() }
     }
 
-    override fun listeners(ctx: CivContext): List<Listener> {
+    override fun listeners(): List<Listener> {
         file = ctx.plugin.dataFolder.resolve("wolves.yml")
         load()
         return listOf(object : Listener {
