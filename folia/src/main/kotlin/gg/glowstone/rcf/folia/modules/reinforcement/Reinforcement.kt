@@ -1,5 +1,6 @@
 package gg.glowstone.rcf.folia.modules.reinforcement
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent
 import gg.glowstone.rcf.core.professions.SkillLevel
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
@@ -10,6 +11,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Particle
+import org.bukkit.block.PistonMoveReaction
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
@@ -154,6 +156,31 @@ internal object Reinforcement : Module("reinforcement") {
             if (ReinforcementStore.tier(event.block) != null) event.isCancelled = true
         }
 
+        // Physics destroys a door whose support is gone; a reinforced one stays put instead.
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onDestroy(event: BlockDestroyEvent) {
+            val block = event.block
+            if (ReinforcementStore.tier(block) == null) return
+            event.isCancelled = true
+            // The player who broke the support already predicted the door gone; show it again.
+            Bukkit.getRegionScheduler().runDelayed(ctx.plugin, block.location, { _ ->
+                for (part in halves(block)) {
+                    for (viewer in part.location.getNearbyPlayers(16.0)) viewer.sendBlockChange(part.location, part.blockData)
+                }
+            }, 1L)
+        }
+
+        // Pistons break doors instead of moving them.
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onPistonBreak(event: BlockPistonExtendEvent) {
+            if (event.blocks.any(::pistonBreaksReinforced)) event.isCancelled = true
+        }
+
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onPistonBreak(event: BlockPistonRetractEvent) {
+            if (event.blocks.any(::pistonBreaksReinforced)) event.isCancelled = true
+        }
+
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onPistonExtend(event: BlockPistonExtendEvent) = move(event, event.blocks, pushing = true)
 
@@ -229,6 +256,9 @@ internal object Reinforcement : Module("reinforcement") {
     private fun clearSlowdown(player: Player) {
         player.getAttribute(Attribute.BLOCK_BREAK_SPEED)?.removeModifier(breakKey)
     }
+
+    private fun pistonBreaksReinforced(block: Block) =
+        block.pistonMoveReaction == PistonMoveReaction.BREAK && ReinforcementStore.tier(block) != null
 
     private fun move(event: BlockPistonEvent, blocks: List<Block>, pushing: Boolean) {
         val facing = (event.block.blockData as? Directional)?.facing ?: return

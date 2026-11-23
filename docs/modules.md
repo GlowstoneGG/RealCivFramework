@@ -49,7 +49,7 @@ Right-click a block with a reinforcement item to make it harder to break.
 - Breaking a reinforced block needs a pickaxe. Copper and iron give back a nugget half the time.
 - Breaking copper reinforcement needs Builder or Miner Apprentice, and iron needs Builder or Miner Journeyman: the same rank as placing it. Lower ranks can't start breaking it. Creative mode skips this.
 - Creeper, TNT and other entity explosions can't destroy reinforced blocks. Bed and respawn-anchor explosions roll the survival chance above; a block that survives loses its reinforcement and drops a nugget.
-- Reinforced blocks don't burn, zombies can't break reinforced doors, and copper and iron reinforcement moves with pistons and falling blocks.
+- Reinforced blocks don't burn, zombies can't break reinforced doors, a reinforced door stays put when the block under it is removed, pistons can't break one, and copper and iron reinforcement moves with pistons and falling blocks.
 - Hold a stick, copper ingot or iron ingot to see reinforced blocks within three chunks as coloured particles: brown for wooden, orange for copper, grey for iron.
 
 ## fullness
