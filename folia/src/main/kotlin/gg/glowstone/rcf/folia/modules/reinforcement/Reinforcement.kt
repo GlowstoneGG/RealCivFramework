@@ -1,14 +1,17 @@
 package gg.glowstone.rcf.folia.modules.reinforcement
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent
 import gg.glowstone.rcf.core.professions.SkillLevel
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
 import gg.glowstone.rcf.folia.modules.professions.Builder
+import gg.glowstone.rcf.folia.modules.professions.Miner
 import gg.glowstone.rcf.folia.modules.professions.roll
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Particle
+import org.bukkit.block.PistonMoveReaction
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
@@ -46,7 +49,7 @@ import org.bukkit.persistence.PersistentDataType
 
 /** Builders reinforce blocks with planks, copper or iron so they break slower and resist explosions. */
 internal object Reinforcement : Module("reinforcement") {
-    override val reads = listOf(Builder)
+    override val reads = listOf(Builder, Miner)
 
     private const val PARTICLE_RADIUS_CHUNKS = 3
     private const val NUGGET_CHANCE = 0.5
@@ -95,6 +98,11 @@ internal object Reinforcement : Module("reinforcement") {
         @EventHandler(ignoreCancelled = true)
         fun onStartBreaking(event: BlockDamageEvent) {
             val tier = ReinforcementStore.tier(event.block) ?: return
+            if (!canBreak(event.player, tier)) {
+                event.isCancelled = true
+                denyBreak(event.player, tier)
+                return
+            }
             event.instaBreak = false
             val attribute = event.player.getAttribute(Attribute.BLOCK_BREAK_SPEED) ?: return
             attribute.removeModifier(breakKey)
@@ -109,8 +117,11 @@ internal object Reinforcement : Module("reinforcement") {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onBreakAttempt(event: BlockBreakEvent) {
             clearSlowdown(event.player)
-            if (ReinforcementStore.tier(event.block) == null) return
-            if (!event.player.inventory.itemInMainHand.type.name.endsWith("_PICKAXE")) {
+            val tier = ReinforcementStore.tier(event.block) ?: return
+            if (!canBreak(event.player, tier)) {
+                event.isCancelled = true
+                denyBreak(event.player, tier)
+            } else if (!event.player.inventory.itemInMainHand.type.name.endsWith("_PICKAXE")) {
                 event.isCancelled = true
                 ctx.actionBar.show(event.player, "reinforcement", Component.text("This block is reinforced; you need a pickaxe"))
             }
@@ -143,6 +154,31 @@ internal object Reinforcement : Module("reinforcement") {
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         fun onDoorBreak(event: EntityBreakDoorEvent) {
             if (ReinforcementStore.tier(event.block) != null) event.isCancelled = true
+        }
+
+        // Physics destroys a door whose support is gone; a reinforced one stays put instead.
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onDestroy(event: BlockDestroyEvent) {
+            val block = event.block
+            if (ReinforcementStore.tier(block) == null) return
+            event.isCancelled = true
+            // The player who broke the support already predicted the door gone; show it again.
+            Bukkit.getRegionScheduler().runDelayed(ctx.plugin, block.location, { _ ->
+                for (part in halves(block)) {
+                    for (viewer in part.location.getNearbyPlayers(16.0)) viewer.sendBlockChange(part.location, part.blockData)
+                }
+            }, 1L)
+        }
+
+        // Pistons break doors instead of moving them.
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onPistonBreak(event: BlockPistonExtendEvent) {
+            if (event.blocks.any(::pistonBreaksReinforced)) event.isCancelled = true
+        }
+
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        fun onPistonBreak(event: BlockPistonRetractEvent) {
+            if (event.blocks.any(::pistonBreaksReinforced)) event.isCancelled = true
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -181,6 +217,15 @@ internal object Reinforcement : Module("reinforcement") {
 
     private fun Tier.label() = name.lowercase()
 
+    /** Breaking a tier needs the Builder or Miner rank that placing it needs, so fresh characters can't break into vaults. */
+    private fun canBreak(player: Player, tier: Tier) = player.gameMode == GameMode.CREATIVE ||
+        ctx.rank(player, Builder) >= tier.requiredRank || ctx.rank(player, Miner) >= tier.requiredRank
+
+    private fun denyBreak(player: Player, tier: Tier) = ctx.actionBar.show(
+        player, "reinforcement",
+        Component.text("Breaking ${tier.label()} reinforcement needs Builder or Miner ${tier.requiredRank.displayName}"),
+    )
+
     private fun reinforceable(block: Block): Boolean {
         val data = block.blockData
         return block.type.isSolid || data is Door || data is TrapDoor || data is Gate || data is Bed
@@ -211,6 +256,9 @@ internal object Reinforcement : Module("reinforcement") {
     private fun clearSlowdown(player: Player) {
         player.getAttribute(Attribute.BLOCK_BREAK_SPEED)?.removeModifier(breakKey)
     }
+
+    private fun pistonBreaksReinforced(block: Block) =
+        block.pistonMoveReaction == PistonMoveReaction.BREAK && ReinforcementStore.tier(block) != null
 
     private fun move(event: BlockPistonEvent, blocks: List<Block>, pushing: Boolean) {
         val facing = (event.block.blockData as? Directional)?.facing ?: return

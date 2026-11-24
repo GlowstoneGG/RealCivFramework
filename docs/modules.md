@@ -47,8 +47,9 @@ Right-click a block with a reinforcement item to make it harder to break.
 - You can upgrade a block to a higher tier, but not reapply the same or a lower one.
 - Solid blocks, doors, trapdoors, fence gates and beds can be reinforced. Doors and beds are reinforced as a whole.
 - Breaking a reinforced block needs a pickaxe. Copper and iron give back a nugget half the time.
+- Breaking copper reinforcement needs Builder or Miner Apprentice, and iron needs Builder or Miner Journeyman: the same rank as placing it. Lower ranks can't start breaking it. Creative mode skips this.
 - Creeper, TNT and other entity explosions can't destroy reinforced blocks. Bed and respawn-anchor explosions roll the survival chance above; a block that survives loses its reinforcement and drops a nugget.
-- Reinforced blocks don't burn, zombies can't break reinforced doors, and copper and iron reinforcement moves with pistons and falling blocks.
+- Reinforced blocks don't burn, zombies can't break reinforced doors, a reinforced door stays put when the block under it is removed, pistons can't break one, and copper and iron reinforcement moves with pistons and falling blocks.
 - Hold a stick, copper ingot or iron ingot to see reinforced blocks within three chunks as coloured particles: brown for wooden, orange for copper, grey for iron.
 
 ## fullness
@@ -62,6 +63,10 @@ Players no longer heal from a full food bar or from peaceful difficulty. Healing
 ## bed-ownership
 
 Sleeping in a bed claims it. Nobody else can sleep in it or set their spawn there. You own one bed at a time: claiming a new one releases the old one (if its chunk is loaded). Sneak and right-click your bed to give it up, which also clears your respawn point. If someone breaks your bed, you're told.
+
+## bed-cooldown
+
+Respawning at your bed or respawn anchor puts it on a 10-minute cooldown. If you die again before it ends, you respawn at world spawn instead, and you're told how long until it's ready. The cooldown counts real time, including while you're offline. A respawn at world spawn doesn't restart it.
 
 ## campfire-rest
 
