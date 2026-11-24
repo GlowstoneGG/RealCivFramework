@@ -2,7 +2,6 @@ package gg.glowstone.rcf.folia.modules.downed
 
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
-import gg.glowstone.rcf.folia.modules.stamina.Stamina
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
@@ -59,6 +58,12 @@ internal object Downed : Module("downed") {
     }
 
     private val downed = ConcurrentHashMap<UUID, State>()
+
+    // Events fire on one thread, so the last replaced event per thread is enough to recognise it later in the same dispatch.
+    private val replaced = ThreadLocal<EntityDamageEvent?>()
+
+    /** True if Downed cancelled [event] only to apply its own outcome (downing or finishing), so the hit still landed. */
+    fun replacedHit(event: EntityDamageEvent): Boolean = replaced.get() === event
 
     fun isDowned(player: UUID): Boolean = downed.containsKey(player)
 
@@ -146,7 +151,7 @@ internal object Downed : Module("downed") {
             val player = event.entity as? Player ?: return
             if (isDowned(player.uniqueId)) {
                 event.isCancelled = true
-                Stamina.recordDownedHit(event)
+                replaced.set(event)
                 end(player)
                 player.health = 0.0
                 return
@@ -157,7 +162,7 @@ internal object Downed : Module("downed") {
             val inventory = player.inventory
             if (inventory.itemInMainHand.type == Material.TOTEM_OF_UNDYING || inventory.itemInOffHand.type == Material.TOTEM_OF_UNDYING) return
             event.isCancelled = true
-            Stamina.recordDownedHit(event)
+            replaced.set(event)
             player.health = (MAX_OVERKILL - overkill).coerceAtLeast(1.0)
             down(player, BLEED_OUT_TICKS)
             player.sendMessage(Component.text("You are bleeding out. A Healer can revive you.", NamedTextColor.RED))

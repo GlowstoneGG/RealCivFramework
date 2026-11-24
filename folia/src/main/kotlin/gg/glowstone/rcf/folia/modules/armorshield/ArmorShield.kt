@@ -2,6 +2,7 @@ package gg.glowstone.rcf.folia.modules.armorshield
 
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import gg.glowstone.rcf.folia.modules.downed.Downed
 import net.kyori.adventure.text.Component
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -45,7 +46,8 @@ internal object ArmorShield : Module("armor-shield") {
         fun onHit(event: EntityDamageByEntityEvent) {
             val victim = event.entity as? Player ?: return
             val attacker = event.damager as? Player ?: return
-            if (event.cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return
+            // Any hit on a downed player finishes them; armour doesn't change that.
+            if (event.cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK || Downed.isDowned(victim.uniqueId)) return
             if (weaponSuffixes.none(attacker.inventory.itemInMainHand.type.name::endsWith)) return
             if (attacker.attackCooldown < 0.85f || event.finalDamage < 2.0 || !fullArmor(victim)) return
             val now = System.currentTimeMillis()

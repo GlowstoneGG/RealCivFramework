@@ -87,7 +87,11 @@ internal object PatDown : Module("pat-down") {
             if (searcher.inventory.itemInMainHand.type != Material.SPYGLASS) return
             event.isCancelled = true
             when {
-                Downed.isDowned(target.uniqueId) -> if (inReach(searcher, target)) searcher.openInventory(target.inventory)
+                Downed.isDowned(target.uniqueId) -> if (inReach(searcher, target)) {
+                    searcher.openInventory(target.inventory)
+                    // Robbing is only allowed while they stay downed and beside you.
+                    ctx.closeWhenInvalid(searcher, target.inventory) { Downed.isDowned(target.uniqueId) && inReach(searcher, target) }
+                }
                 ctx.rank(searcher, Hunter) >= SkillLevel.APPRENTICE -> windup(searcher, target)
                 else -> ctx.actionBar.show(searcher, "pat-down", Component.text("Only Hunters can search a standing player"))
             }

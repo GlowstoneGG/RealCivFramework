@@ -76,14 +76,6 @@ internal object Stamina : Module("stamina") {
 
     // Each player's entry is only written on that player's region; `winded` is also read from damage events.
     private val states = ConcurrentHashMap<UUID, State>()
-    private val downedHits = ConcurrentHashMap.newKeySet<EntityDamageByEntityEvent>()
-
-    /** Downed calls this when it replaces an accepted hit with its own damage outcome. */
-    fun recordDownedHit(event: EntityDamageEvent) {
-        if (enabled && event is EntityDamageByEntityEvent && event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            downedHits.add(event)
-        }
-    }
 
     fun isMovingSprint(sprinting: Boolean, insideVehicle: Boolean, winded: Boolean, horizontalDistanceSquared: Double): Boolean =
         sprinting && !insideVehicle && !winded && horizontalDistanceSquared > MOVEMENT_EPSILON_SQUARED
@@ -227,9 +219,7 @@ internal object Stamina : Module("stamina") {
 
         @EventHandler(priority = EventPriority.MONITOR)
         fun onMelee(event: EntityDamageByEntityEvent) {
-            // Consume the mark even if a later listener uncancelled the event; one handler charges both paths.
-            val replacedByDowned = downedHits.remove(event)
-            if (event.isCancelled && !replacedByDowned) return
+            if (event.isCancelled && !Downed.replacedHit(event)) return
             val attacker = event.damager as? Player ?: return
             if (event.cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return
             val cost = MELEE_HIT * (1 - 0.08 * ctx.rank(attacker, Hunter).ordinal)

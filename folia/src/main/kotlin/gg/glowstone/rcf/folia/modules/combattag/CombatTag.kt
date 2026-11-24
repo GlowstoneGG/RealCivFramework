@@ -2,6 +2,7 @@ package gg.glowstone.rcf.folia.modules.combattag
 
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.civKey
+import gg.glowstone.rcf.folia.modules.downed.Downed
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -51,8 +52,10 @@ internal object CombatTag : Module("combat-tag") {
     }
 
     override fun listeners() = listOf(object : Listener {
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        // Hits that down or finish a player are cancelled by Downed but still count as combat.
+        @EventHandler(priority = EventPriority.MONITOR)
         fun onHit(event: EntityDamageByEntityEvent) {
+            if (event.isCancelled && !Downed.replacedHit(event)) return
             val victim = event.entity as? Player ?: return
             val attacker = event.damager as? Player ?: (event.damager as? Projectile)?.shooter as? Player ?: return
             if (attacker == victim) return

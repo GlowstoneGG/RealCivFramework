@@ -3,6 +3,7 @@ package gg.glowstone.rcf.folia.modules.spawngrace
 import gg.glowstone.rcf.folia.framework.Module
 import gg.glowstone.rcf.folia.framework.ProfessionXpGainEvent
 import gg.glowstone.rcf.folia.framework.civKey
+import gg.glowstone.rcf.folia.modules.downed.Downed
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -122,8 +123,10 @@ internal object SpawnGrace : Module("spawn-grace") {
             mob.scheduler.run(ctx.plugin, { if (mob.target?.uniqueId == victim.uniqueId) mob.target = null }, null)
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        // Downing or finishing a player is cancelled by Downed but still ends the attacker's grace.
+        @EventHandler(priority = EventPriority.MONITOR)
         fun onAttack(event: EntityDamageByEntityEvent) {
+            if (event.isCancelled && !Downed.replacedHit(event)) return
             val attacker = event.attackingPlayer() ?: return
             if (event.finalDamage > 0 && hasGrace(attacker.uniqueId)) attacker.scheduler.run(ctx.plugin, { end(attacker) }, null)
         }

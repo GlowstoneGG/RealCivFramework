@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.Inventory
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -46,6 +47,21 @@ internal class CivContext(
         }
         val applied = professions.add(player, profession, amount)
         if (applied > 0) plugin.server.pluginManager.callEvent(ProfessionXpGainEvent(player, profession.id, applied))
+    }
+
+    /**
+     * Closes [inventory] for [viewer] as soon as [valid] fails, checked every tick on the viewer's region while it stays open.
+     * Plugin-opened windows have no reach check of their own.
+     */
+    fun closeWhenInvalid(viewer: Player, inventory: Inventory, valid: () -> Boolean) {
+        viewer.scheduler.runAtFixedRate(plugin, { task ->
+            if (viewer.openInventory.topInventory != inventory) {
+                task.cancel()
+            } else if (!valid()) {
+                task.cancel()
+                viewer.closeInventory()
+            }
+        }, null, 1L, 1L)
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

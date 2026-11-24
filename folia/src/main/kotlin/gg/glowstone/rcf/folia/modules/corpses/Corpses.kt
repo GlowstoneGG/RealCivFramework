@@ -25,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap
 /** A player's drops stay with their corpse for 15 minutes instead of scattering. Anyone can loot it. */
 internal object Corpses : Module("corpses") {
     private const val LIFETIME_MS = 15 * 60 * 1000L
+
+    // Vanilla's container reach.
+    private const val REACH_SQUARED = 8.0 * 8.0
     private val itemsKey = civKey("corpse_items")
     private val ownerKey = civKey("corpse_owner")
     private val expiresKey = civKey("corpse_expires_at")
@@ -86,7 +89,13 @@ internal object Corpses : Module("corpses") {
             val loot = Loot(corpse)
             loot.view = Bukkit.createInventory(loot, 54, corpse.customName() ?: Component.text("Corpse"))
             loot.view.addItem(*items(corpse).toTypedArray())
-            event.player.openInventory(loot.view)
+            val player = event.player
+            player.openInventory(loot.view)
+            // Close while the corpse is still loaded beside them, so the close handler can save what's left.
+            ctx.closeWhenInvalid(player, loot.view) {
+                Bukkit.isOwnedByCurrentRegion(corpse) && corpse.isValid && corpse.world == player.world &&
+                    corpse.location.distanceSquared(player.location) <= REACH_SQUARED
+            }
         }
 
         @EventHandler
@@ -94,11 +103,13 @@ internal object Corpses : Module("corpses") {
             val loot = event.inventory.holder as? Loot ?: return
             val remaining = loot.view.contents.filterNotNull().filterNot { it.isEmpty }
             val corpse = loot.corpse
-            corpse.scheduler.run(ctx.plugin, {
+            val task = corpse.scheduler.run(ctx.plugin, {
                 looting.remove(corpse.uniqueId)
                 if (remaining.isEmpty()) corpse.remove()
                 else corpse.persistentDataContainer.set(itemsKey, PersistentDataType.BYTE_ARRAY, ItemStack.serializeItemsAsBytes(remaining))
             }, { looting.remove(corpse.uniqueId) })
+            // Already unloaded: neither callback runs, and a stuck mark would block looting and expiry forever.
+            if (task == null) looting.remove(corpse.uniqueId)
         }
 
         @EventHandler
